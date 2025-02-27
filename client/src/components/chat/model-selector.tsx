@@ -22,3 +22,27 @@ export function ModelSelector({ selectedModel, onModelChange }: ModelSelectorPro
     </Select>
   );
 }
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { availableModels } from "@/lib/openrouter";
+
+interface ModelSelectorProps {
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+export function ModelSelector({ value, onValueChange }: ModelSelectorProps) {
+  return (
+    <Select value={value} onValueChange={onValueChange}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select a model" />
+      </SelectTrigger>
+      <SelectContent>
+        {availableModels.map((model) => (
+          <SelectItem key={model.id} value={model.id}>
+            {model.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}

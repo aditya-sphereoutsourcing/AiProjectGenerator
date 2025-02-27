@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -26,9 +26,6 @@ export function ApiKeySetup({ onApiKeySet }: ApiKeySetupProps) {
     // Save the API key to localStorage for temporary persistence
     localStorage.setItem("openrouter_api_key", apiKey);
     
-    // Reload the page to apply the new API key
-    window.location.reload();
-    
     toast({
       title: "Success",
       description: "API key has been saved",
@@ -40,22 +37,29 @@ export function ApiKeySetup({ onApiKeySet }: ApiKeySetupProps) {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Set OpenRouter API Key</CardTitle>
+        <CardTitle>OpenRouter API Key</CardTitle>
         <CardDescription>
-          You need to set your OpenRouter API key to use this application. 
-          Visit <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer" className="text-primary underline">openrouter.ai</a> to get an API key.
+          You can use the default API key or set your own from 
+          <a href="https://openrouter.ai" target="_blank" rel="noopener noreferrer" className="text-primary underline ml-1">
+            openrouter.ai
+          </a>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Input
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          placeholder="Enter your OpenRouter API key"
+          placeholder="Enter your OpenRouter API key (optional)"
           type="password"
         />
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleSaveApiKey} className="w-full">Save API Key</Button>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline" onClick={onApiKeySet}>
+          Use Default Key
+        </Button>
+        <Button onClick={handleSaveApiKey}>
+          Save Custom Key
+        </Button>
       </CardFooter>
     </Card>
   );

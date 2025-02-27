@@ -1,7 +1,8 @@
-// Try to get API key from localStorage first, then fallback to environment variable
+
+// Default API key and user-provided API key handling
+const DEFAULT_API_KEY = "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";
 const OPENROUTER_API_KEY = localStorage.getItem("openrouter_api_key") || 
-                          import.meta.env.VITE_OPENROUTER_API_KEY || 
-                          "";
+                           DEFAULT_API_KEY;
 
 export interface Message {
   role: "user" | "assistant";
@@ -16,6 +17,7 @@ export interface ModelOption {
 
 export const availableModels: ModelOption[] = [
   { id: "anthropic/claude-3-5-sonnet-20241022", name: "Claude 3 Sonnet", provider: "Anthropic" },
+  { id: "deepseek/deepseek-r1-distill-llama-70b", name: "DeepSeek R1 Distill", provider: "DeepSeek" },
   { id: "deepseek/deepseek-coder", name: "DeepSeek Coder", provider: "DeepSeek" },
   { id: "meta-llama/codellama-70b", name: "Code Llama 70B", provider: "Meta" },
 ];
@@ -41,7 +43,7 @@ export async function chatCompletion(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "HTTP-Referer": window.location.origin,
         "X-Title": "AI Code Generator",
       },
