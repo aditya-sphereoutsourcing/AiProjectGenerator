@@ -1,4 +1,3 @@
-
 // Default API key and user-provided API key handling
 const DEFAULT_API_KEY = "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";
 const OPENROUTER_API_KEY = localStorage.getItem("openrouter_api_key") || 
@@ -35,32 +34,54 @@ export async function chatCompletion(
   model: string
 ): Promise<string> {
   if (!OPENROUTER_API_KEY) {
-    throw new Error("OpenRouter API key is not configured");
+    throw new Error("OPENROUTER_API_KEY is not set. Please set it in your environment variables.");
   }
 
+  console.log("OpenRouter API Key length:", OPENROUTER_API_KEY.length);
+  console.log("Using model:", model);
+
   try {
+    console.log("Making API request to OpenRouter");
+    const requestBody = {
+      model: model,
+      messages: messages,
+    };
+    console.log("Request payload:", JSON.stringify(requestBody, null, 2));
+
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "HTTP-Referer": window.location.origin,
-        "X-Title": "AI Code Generator",
+        "X-Title": "AI Code Generator"
       },
-      body: JSON.stringify({
-        model,
-        messages,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    console.log("Response status:", response.status);
+    console.log("Response status text:", response.statusText);
+
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: { message: "Unknown error" } }));
-      throw new Error(`API request failed: ${errorData.error?.message || response.statusText}`);
+      const responseText = await response.text();
+      console.error("Error response body:", responseText);
+
+      try {
+        const errorData = JSON.parse(responseText);
+        throw new Error(`API request failed: ${errorData.error?.message || response.statusText}`);
+      } catch (parseError) {
+        throw new Error(`API request failed (${response.status}): ${responseText || response.statusText}`);
+      }
     }
 
-    const data = await response.json() as OpenRouterResponse;
+    const rawData = await response.text();
+    console.log("Raw response data:", rawData.substring(0, 200) + (rawData.length > 200 ? "..." : ""));
+
+    const data = JSON.parse(rawData) as OpenRouterResponse;
+    console.log("Parsed response data:", JSON.stringify(data, null, 2).substring(0, 200) + "...");
 
     if (!data.choices?.[0]?.message?.content) {
+      console.error("Invalid response format:", JSON.stringify(data, null, 2));
       throw new Error("Invalid response format from OpenRouter API");
     }
 

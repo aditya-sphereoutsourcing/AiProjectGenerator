@@ -37,14 +37,20 @@ export function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const content = await chatCompletion([...messages, userMessage], selectedModel);
-      const assistantMessage: Message = { role: "assistant", content };
+      console.log("Sending chat request with model:", selectedModel);
+      console.log("Messages being sent:", JSON.stringify([...messages, userMessage], null, 2));
+
+      const aiResponse = await chatCompletion([...messages, userMessage], selectedModel);
+      console.log("Received AI response:", aiResponse.substring(0, 100) + (aiResponse.length > 100 ? "..." : ""));
+
+      const assistantMessage: Message = { role: "assistant", content: aiResponse };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
       console.error("Chat error:", error);
+      console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to get response from API",
+        description: `Failed to get response: ${error instanceof Error ? error.message : "Unknown error"}`,
         variant: "destructive",
       });
     } finally {
