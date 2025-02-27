@@ -26,6 +26,10 @@ export const availableModels: ModelOption[] = [
 const client = new OpenAI({
   baseURL: "https://openrouter.ai/api/v1",
   apiKey: OPENROUTER_API_KEY,
+  defaultHeaders: {
+    "HTTP-Referer": window.location.origin,
+    "X-Title": "AI Code Generator"
+  },
   dangerouslyAllowBrowser: true // Required for client-side use
 });
 
@@ -46,11 +50,7 @@ export async function chatCompletion(
 
     const completion = await client.chat.completions.create({
       model: model,
-      messages: messages as any,
-      extra_headers: {
-        "HTTP-Referer": window.location.origin,
-        "X-Title": "AI Code Generator"
-      }
+      messages: messages as any
     });
 
     console.log("Response received:", completion);
