@@ -1,0 +1,57 @@
+Create a self-building AI-powered chatbot that:
+✅ Instantly starts generating project files when the website loads
+✅ Builds entire applications (bots, web apps, APIs) based on user input
+✅ Automates file generation, debugging, and structuring
+✅ Interacts with GitHub to pull/push code
+✅ Provides real-time logs & debugging console
+
+🔹 Tech Stack
+Component	Tech Stack Options
+Frontend	React.js (Vite) / Next.js
+Backend	Node.js (Express) / Python (FastAPI) / GoLang
+Database	PostgreSQL / MongoDB (File Storage)
+AI Processing	OpenAI GPT-4 / DeepSeek AI
+Version Control	GitHub API (Auto Commit & Push)
+File Management	Docker + Kubernetes for auto-deployment
+Debugging	Logging with Winston & Debug Console
+🔹 System Architecture & File Structure
+📂 Project Root
+├── 📂 backend (Handles AI logic, API calls)
+│ ├── server.js (Main API logic)
+│ ├── bot.js (Generates & manages projects)
+│ ├── github.js (Pushes to GitHub repo)
+│ ├── debugger.js (Tracks errors & logs)
+│ ├── 📂 generated_files (AI-generated project files)
+│ ├── 📂 logs (Debugging logs)
+│ ├── 📄 .env (API keys, GitHub tokens)
+├── 📂 frontend (Chat UI for input)
+│ ├── App.jsx (Main UI)
+│ ├── Chatbox.jsx (User chat input)
+│ ├── Terminal.jsx (Shows logs/debug info)
+│ ├── styles.css (UI styling)
+├── 📄 Dockerfile (For deployment)
+├── 📄 package.json (Dependencies)
+├── 📄 README.md (Instructions)
+
+🔹 How It Works
+1️⃣ User visits the website → AI starts generating files instantly
+2️⃣ User types in the chatbot (e.g., "Create a bot for Twitter automation")
+3️⃣ AI generates structured project files in the backend folder
+4️⃣ Code is auto-committed & pushed to GitHub
+5️⃣ Debugging logs show errors & status in real-time
+
+🔹 Key API Endpoints
+Endpoint	Method	Description
+/api/start	POST	Starts generating project files
+/api/build	POST	AI builds the requested software
+/api/debug	GET	Fetches debugging logs
+/api/github/push	POST	Commits & pushes code to GitHub
+/api/status	GET	Fetches build status
+🔹 Debugging & Logging
+Winston Logger for real-time error tracking
+Auto-debugging file (debugger.js) that fixes common issues
+Live Terminal UI (Terminal.jsx) for tracking progress
+🚀 Expected Output
+A fully autonomous bot that generates ready-to-run applications
+Instant file structuring, debugging, and GitHub commits
+No login page—just visit, type, and build anything instantly!
