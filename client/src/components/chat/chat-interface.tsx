@@ -48,9 +48,15 @@ export function ChatInterface() {
     } catch (error) {
       console.error("Chat error:", error);
       console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      let errorMessage = "Failed to get response from AI";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Error",
-        description: `Failed to get response: ${error instanceof Error ? error.message : "Unknown error"}`,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
