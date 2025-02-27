@@ -1,6 +1,6 @@
 // Default API key and user-provided API key handling
 const DEFAULT_API_KEY = "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";
-const OPENROUTER_API_KEY = localStorage.getItem("openrouter_api_key") || 
+const OPENROUTER_API_KEY = localStorage.getItem("openrouter_api_key") || DEFAULT_API_KEY; 
                            DEFAULT_API_KEY;
 
 export interface Message {
