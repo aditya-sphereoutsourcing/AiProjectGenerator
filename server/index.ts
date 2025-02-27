@@ -2,6 +2,9 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Set default OpenRouter API key if not provided in environment
+process.env.OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || "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";
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

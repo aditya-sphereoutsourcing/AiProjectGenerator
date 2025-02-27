@@ -1,9 +1,5 @@
-import { OpenAI } from "openai";
 
-// Default API key and user-provided API key handling
-const DEFAULT_API_KEY = "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";
-const OPENROUTER_API_KEY = localStorage.getItem("openrouter_api_key") || DEFAULT_API_KEY;
-
+// Model definitions and API interface for OpenRouter
 export interface Message {
   role: "user" | "assistant";
   content: string;
@@ -22,52 +18,46 @@ export const availableModels: ModelOption[] = [
   { id: "meta-llama/codellama-70b", name: "Code Llama 70B", provider: "Meta" },
 ];
 
-// Initialize OpenAI client with OpenRouter base URL
-const client = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: OPENROUTER_API_KEY,
-  defaultHeaders: {
-    "HTTP-Referer": window.location.origin,
-    "X-Title": "AI Code Generator"
-  },
-  dangerouslyAllowBrowser: true // Required for client-side use
-});
-
 export async function chatCompletion(
   messages: Message[],
   model: string
 ): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error("OPENROUTER_API_KEY is not set. Please set it in your environment variables.");
-  }
-
-  console.log("OpenRouter API Key length:", OPENROUTER_API_KEY.length);
-  console.log("Using model:", model);
+  // Get API key from localStorage if available
+  const apiKey = localStorage.getItem("openrouter_api_key") || undefined;
+  
+  console.log("Client: Using model:", model);
+  console.log("Client: Messages being sent:", JSON.stringify(messages, null, 2));
 
   try {
-    console.log("Making API request to OpenRouter using OpenAI SDK");
-    console.log("Messages being sent:", JSON.stringify(messages, null, 2));
-
-    const completion = await client.chat.completions.create({
-      model: model,
-      messages: messages as any
+    // Call our backend API instead of OpenRouter directly
+    const response = await fetch("/api/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages,
+        model,
+        apiKey
+      }),
     });
 
-    console.log("Response received:", completion);
-
-    if (!completion.choices[0]?.message?.content) {
-      throw new Error("Invalid response format from OpenRouter API");
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Client: Chat API error:", response.status, errorText);
+      throw new Error(`API request failed (${response.status}): ${errorText}`);
     }
 
-    return completion.choices[0].message.content;
+    const data = await response.json();
+    console.log("Client: Response received:", data);
+
+    if (!data.completion) {
+      throw new Error("Invalid response format from API");
+    }
+
+    return data.completion;
   } catch (error) {
-    console.error("Chat completion error:", error);
-    if (error instanceof Error) {
-      console.error("Error details:", JSON.stringify({
-        message: error.message,
-        stack: error.stack
-      }));
-    }
+    console.error("Client: Chat completion error:", error);
     throw error;
   }
 }

@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertMessageSchema, insertFileSchema, insertLogSchema } from "@shared/schema";
+import { chatCompletion } from "./openrouter";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
@@ -61,6 +62,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     const log = await storage.addLog(result.data);
     res.json(log);
+  });
+
+  // OpenRouter API chat completion endpoint
+  app.post("/api/chat/completions", async (req, res) => {
+    try {
+      const { messages, model, apiKey } = req.body;
+      
+      if (!messages || !model) {
+        return res.status(400).json({ error: "Missing required parameters: messages or model" });
+      }
+      
+      const completion = await chatCompletion(messages, model, apiKey);
+      res.json({ completion });
+    } catch (error) {
+      console.error("Chat completion error:", error);
+      res.status(500).json({ 
+        error: error instanceof Error ? error.message : "Unknown error during chat completion" 
+      });
+    }
   });
 
   return httpServer;
