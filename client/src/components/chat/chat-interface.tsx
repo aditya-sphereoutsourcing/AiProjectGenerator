@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,13 +7,25 @@ import { ModelSelector } from "./model-selector";
 import { chatCompletion, type Message } from "@/lib/openrouter";
 import { useToast } from "@/hooks/use-toast";
 import { Send, Loader2, Code } from "lucide-react";
+import { ApiKeySetup } from "./api-key-setup";
 
 export function ChatInterface() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("anthropic/claude-3-5-sonnet-20241022");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Check if API key is in localStorage
+    const storedApiKey = localStorage.getItem("openrouter_api_key");
+    if (storedApiKey) {
+      // Set the API key in window for the module to access
+      window.OPENROUTER_API_KEY = storedApiKey;
+      setHasApiKey(true);
+    }
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -50,6 +62,16 @@ export function ChatInterface() {
       handleSend();
     }
   };
+
+  if (!hasApiKey) {
+    return (
+      <Card className="h-[600px] flex flex-col">
+        <div className="flex items-center justify-center h-full">
+          <ApiKeySetup onApiKeySet={() => setHasApiKey(true)} />
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="h-[600px] flex flex-col">
