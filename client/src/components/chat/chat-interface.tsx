@@ -22,6 +22,106 @@ export function ChatInterface() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    
+    try {
+      const content = await chatCompletion([...messages, userMessage], selectedModel);
+      
+      const assistantMessage: Message = {
+        role: "assistant",
+        content,
+      };
+      
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to get response from AI. Make sure your API key is set correctly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+  
+  return (
+    <Card className="h-[600px] flex flex-col">
+      <div className="p-4 border-b">
+        <ModelSelector 
+          value={selectedModel} 
+          onChange={setSelectedModel} 
+          disabled={isLoading} 
+        />
+      </div>
+      
+      <CardContent className="flex-grow overflow-hidden p-0">
+        <ScrollArea className="h-[450px] p-4">
+          {messages.length === 0 ? (
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              Send a message to start the conversation
+            </div>
+          ) : (
+            <div className="space-y-4 py-4">
+              {messages.map((message, i) => (
+                <div
+                  key={i}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                      message.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
+                    }`}
+                  >
+                    <pre className="whitespace-pre-wrap font-sans">
+                      {message.content}
+                    </pre>
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-lg px-4 py-2 bg-muted">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </ScrollArea>
+      </CardContent>
+      
+      <div className="p-4 border-t">
+        <div className="flex space-x-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type your message..."
+            disabled={isLoading}
+            className="flex-grow"
+          />
+          <Button onClick={handleSend} disabled={isLoading || !input.trim()}>
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Send className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
 
     try {
       const response = await chatCompletion([...messages, userMessage], selectedModel);
